@@ -6,6 +6,7 @@ import re
 import config
 
 invite_regex: re.Pattern = re.compile(r"discord\.(gg/|com/invite)")
+link_regex: re.Pattern = re.compile(r"\[([^]]+)]\(([^)]+)\)")
 
 
 class Client(discord.Client):
@@ -26,7 +27,7 @@ class Client(discord.Client):
 
         # Actual message filtering
         content = message.content
-        if await has_discord_invite(content):
+        if await has_likely_scam(content):
             await message.delete()
             if message.author.id in self.kicked_users:
                 try:
@@ -53,8 +54,16 @@ class Client(discord.Client):
                 self.kicked_users.append(message.author.id)
 
 
-async def has_discord_invite(content: str):
-    return invite_regex.match(content)
+async def has_likely_scam(content: str) -> bool:
+    if invite_regex.match(content):
+        return True
+    link_matches: list[tuple[str, str]] = link_regex.findall(content)
+    if len(link_matches) > 0:
+        for match in link_matches:
+            text, link = match
+            if "steam" in text:
+                return True
+    return False
 
 
 async def is_admin(author: Union[discord.Member, discord.abc.User]):
