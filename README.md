@@ -13,3 +13,4 @@ Discord bot for ImmersiveMC's Discord server. Mainly provided so people can see 
 ## Features
 
 - If someone sends a Discord invite, kick them and DM them about it. If they send another, ban them and DM them about it. Doesn't apply to admins in production, and tracking if a user has already been kicked is only done in memory, meaning bot restarts make the bot "forget" about any kicks.
+- A `/tag` command to allow sending premade text to users quickly.
