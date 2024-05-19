@@ -1,5 +1,6 @@
 import os
 from typing import Union
+import discord
 
 # User Config
 
@@ -7,6 +8,9 @@ TEST_TOKEN: str = os.environ.get("IMMERSIVEMC_TOKEN_TEST")
 PROD_TOKEN: str = os.environ.get("IMMERSIVEMC_TOKEN_PROD")
 
 DEV_FILTER_ADMINS: bool = True  # Whether to filter admin messages in dev
+
+PROD_GUILDS: list[discord.Object] = [discord.Object(i) for i in os.environ.get("IMMERSIVEMC_GUILD_IDS_PROD").split(",")]
+DEV_GUILDS: list[discord.Object] = [discord.Object(i) for i in os.environ.get("IMMERSIVEMC_GUILD_IDS_TEST").split(",")]
 
 KICK_MESSAGE: str = """You have been kicked from the ImmersiveMC Discord server.
 

@@ -1,21 +1,54 @@
 from typing import Union
 import discord
+from discord import app_commands
 import sys
 import re
 
 import config
+import tags
 
 invite_regex: re.Pattern = re.compile(r"discord\.(gg/|com/invite)")
 link_regex: re.Pattern = re.compile(r"\[([^]]+)]\(([^)]+)\)")
 
 
 class Client(discord.Client):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, do_sync: bool, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.do_sync = do_sync
         self.kicked_users: list[int] = []
+        self.tree = app_commands.CommandTree(self)
+        self.allowed_mentions = discord.AllowedMentions(everyone=False, users=True, roles=False, replied_user=True)
+        # noinspection PyTypeChecker
+        self.tree.add_command(discord.app_commands.Command(name="tag", description="Send premade text quickly.",
+                callback=self.tag_command), guilds=config.PROD_GUILDS)
+
+    async def sync_commands(self):
+        print("Syncing commands to guilds.")
+        guilds = config.PROD_GUILDS if config.is_prod else config.DEV_GUILDS
+        for guild in guilds:
+            await self.tree.sync(guild=guild)
+        print("Commands synced!")
+
+    async def tag_command(self, interaction: discord.Interaction, tag: str, user_to_ping: str = ""):
+        is_error = False
+        if not interaction.user.guild_permissions.administrator:
+            response = "Only admins can use the /tag command."
+            is_error = True
+        else:
+            tag = tag.lower()
+            if tag in tags.TAGS:
+                response = tags.TAGS[tag]
+                if user_to_ping != "":
+                    response = f"{user_to_ping}: {response}"
+            else:
+                response = "Tag not found."
+                is_error = True
+        await interaction.response.send_message(response, suppress_embeds=True, ephemeral=is_error)
 
     async def on_ready(self):
         print(f"Logged in as {self.user} on {config.get_prod_string()}.")
+        if self.do_sync:
+            await self.sync_commands()
 
     async def on_message(self, message: discord.Message):
         if message.author == self.user:

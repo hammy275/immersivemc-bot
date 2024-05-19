@@ -5,9 +5,10 @@ Discord bot for ImmersiveMC's Discord server. Mainly provided so people can see 
 ## Setup
 
 1. Set the environment variables `IMMERSIVEMC_TOKEN_TEST` and `IMMERSIVEMC_TOKEN_PROD` to the token(s) for your Discord bot(s). You can either use a separate bot for development/testing and for production, or use one for both.
-2. Invite to your Discord server.
-3. ???
-4. Profit!
+2. Set the environment variables `IMMERSIVEMC_GUILD_IDS_TEST` and `IMMERSIVEMC_GUILD_IDS_PROD` to a comma-separated list of guild IDs for commands to be available in.
+3. Invite to your Discord server.
+4. ???
+5. Profit!
 
 ## Features
 
